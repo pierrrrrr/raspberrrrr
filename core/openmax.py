@@ -1,3 +1,9 @@
+#
+# Based on pyopenmax by Peter de Rivaz.
+#
+
+
+
 from ctypes import Structure, Union
 from ctypes import c_int, c_uint, c_char, c_char_p, c_void_p
 from ctypes import cast
