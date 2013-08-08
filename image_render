@@ -97,7 +97,7 @@ def update_port_settings2():
 filler = core.buffering.Filler(utils.read('data/gradient.jpg'), decoder, 320)
 
 filler.fill_one_buffer()
-udecoder.wait_for('port_settings_changed')
+decoder.wait_for('port_settings_changed')
 update_port_settings()
 resizer.wait_for('port_settings_changed')
 update_port_settings2()
