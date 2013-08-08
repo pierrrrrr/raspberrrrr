@@ -42,7 +42,7 @@ ALL=4294967295
 
 
 #level=$(($GENERAL|$GENERAL_VERBOSE|))
-level=$(($ALL^$GENERAL_VERBOSE^USER_VERBOSE^$HDMI^$HDMI_VERBOSE))
+level=$(($ALL^$GENERAL_VERBOSE^$USER_VERBOSE^$HDMI^$HDMI_VERBOSE))
 
 echo "setting level flags: ${level}"
 /opt/vc/bin/vcgencmd set_logging level=$level
