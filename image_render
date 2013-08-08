@@ -1,0 +1,110 @@
+#!/usr/bin/env python
+
+import sys
+
+import core
+from core.openmax import *
+from core import utils
+from core.utils import ensure
+
+
+
+#
+# Load components and set ports into sane state.
+#
+
+decoder = core.component.Image('image_decode')
+decoder.ensure_loaded()
+
+decoder.disable_port(320).wait_for('command_completed')
+decoder.disable_port(321).wait_for('command_completed')
+
+resizer = core.component.Image('resize')
+resizer.ensure_loaded()
+
+resizer.disable_port(60).wait_for('command_completed')
+resizer.disable_port(61).wait_for('command_completed')
+
+renderer = core.component.VideoRenderer()
+renderer.ensure_loaded()
+
+renderer.disable_port(90).wait_for('command_completed')
+
+
+
+#
+# Configure decoder's input port with properties of JPEG data
+# we are going to feed to it next.
+#
+
+decoder.set_port_format(320, compression=OMX_IMAGE_CodingJPEG)
+
+
+decoder.transition_to_idle()
+resizer.transition_to_idle()
+renderer.transition_to_idle()
+
+
+decoder.enable_port(320)
+decoder.allocate_buffers(decoder.get_port_definition(320))
+decoder.wait_for('command_completed')  # Port is enabled when enough buffers is allocated.
+
+
+
+decoder.transition_to_executing()
+decoder.ensure_executing()
+
+
+
+def update_port_settings():
+    decoder.transition_to_idle()
+
+    resizer.ensure_idle()
+    renderer.ensure_idle()
+
+    decoder_output_portdef = decoder.get_port_definition(321)
+    decoder_output_portdef.format.image.eColorFormat = OMX_COLOR_FormatYUV420PackedPlanar
+    decoder.set_port_definition(321, decoder_output_portdef)
+
+    resizer_output_portdef = resizer.get_port_definition(61)
+    resizer_output_portdef.format = decoder_output_portdef.format  # Kludge.
+    resizer.set_port_definition(61, resizer_output_portdef)
+
+    decoder.tunnel(321, resizer, 60)
+
+    decoder.transition_to_executing()
+    resizer.transition_to_executing()
+
+
+def update_port_settings2():
+    resizer.transition_to_idle()
+
+    resizer_output_portdef = resizer.get_port_definition(61)
+    resizer.set_port_definition(61, resizer_output_portdef)
+    
+    # Not working. It seems like renderer input port might be misconfigured.
+    #renderer_port_definition = renderer.get_port_definition(90)
+    #renderer_port_definition.format.image.eColorFormat = OMX_COLOR_FormatYUV420PackedPlanar
+    #renderer.set_port_definition(90, renderer_port_definition)
+
+    resizer.tunnel(61, renderer, 90)
+
+    resizer.transition_to_executing()
+    renderer.transition_to_executing()
+
+
+
+filler = core.buffering.Filler(utils.read('data/gradient.jpg'), decoder, 320)
+
+filler.fill_one_buffer()
+udecoder.wait_for('port_settings_changed')
+update_port_settings()
+resizer.wait_for('port_settings_changed')
+update_port_settings2()
+
+
+filler.fill_rest_of_data()  # No end of stream event callback?
+
+
+utils.sleep(0.1)  # TODO: Proper teardown.
+

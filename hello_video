@@ -1,0 +1,2 @@
+#!/bin/sh
+/opt/vc/src/hello_pi/hello_video/hello_video.bin /opt/vc/src/hello_pi/hello_video/test.h264
