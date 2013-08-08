@@ -1,6 +1,6 @@
 
- Introduction
---------------
+Introduction
+------------
 
 This is my work-in-progress attempt to learn OpenMAX.
 
@@ -16,8 +16,8 @@ With some more time available I will definitley continue learning OpenMAX
 (as well as try to get this code a little bit more useful for other people).
 
 
- Caveats
----------
+Caveats
+-------
 
 Bugs.
 
