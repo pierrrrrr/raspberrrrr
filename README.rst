@@ -1,4 +1,7 @@
 
+ Introduction
+--------------
+
 This is my work-in-progress attempt to learn OpenMAX.
 
 
@@ -12,4 +15,12 @@ peterderivaz's https://github.com/peterderivaz/pyopenmax
 With some more time available I will definitley continue learning OpenMAX
 (as well as try to get this code a little bit more useful for other people).
 
+
+ Caveats
+---------
+
+Bugs.
+
+Code was put together from few different sources so
+it sometimes might seem a little odd.
 
